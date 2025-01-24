@@ -1,8 +1,8 @@
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{
-    get_key_details, load_config, retrieve_key, save_config, store_key, EncryptedKey, State,
+use crate::state::{get_key_details, retrieve_key, save_config, store_key, State};
+use cosmwasm_std::{
+    entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
 };
-use cosmwasm_std::{entry_point, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
 
 #[entry_point]
 pub fn instantiate(
@@ -40,18 +40,8 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
 }
 
 #[entry_point]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Response<EncryptedKey>> {
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetKeyDetails { key } => get_key_details(deps.storage, key).map(|key_details| {
-            let state = load_config(deps.storage);
-            return Response::new()
-                .add_attribute("action", "get_key_details")
-                .add_attribute("key_id", key.to_string())
-                .add_attribute("creator", key_details.creator.clone())
-                .add_attribute("recipient", key_details.recipient.clone())
-                .add_attribute("retrieved", key_details.retrieved.to_string())
-                .add_attribute("timestamp", key_details.timestamp.to_string())
-                .add_attribute("encrypted_data", state.unwrap().broadcast);
-        }),
+        QueryMsg::GetKeyDetails { key } => to_json_binary(&get_key_details(deps.storage, key)?),
     }
 }

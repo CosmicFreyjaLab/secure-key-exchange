@@ -14,7 +14,7 @@ pub struct State {
     pub creator: Addr,
     pub broadcast: String,
 }
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, JsonSchema)]
 pub struct EncryptedKey {
     pub key_id: u64,
     pub creator: Addr,
